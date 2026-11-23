@@ -1,0 +1,40 @@
+# Version API của loại tài nguyên
+apiVersion: apps/v1
+
+#Loại tài nguyên muốn khai báo
+kind: Deployment
+
+metadata:
+  # Tên Deployment
+  name: demo-api
+
+  # Nhãn chính của Deployment
+  labels:
+    app: demo-api
+
+spec:
+  # Muốn duy trì 2 Pod
+  replicas: 2
+
+  # Điều kiện chọn nhãn
+  selector:
+
+    # Điều kiện chọn của Deployment
+    matchLabels:
+      app: demo-api
+  # Khuôn mẫu để tạo Pod
+  template:
+    metadata:
+      # Nhãn được gắn cho Pod tạo từ template
+      labels:
+        app: demo-api
+        tier: backend
+
+    spec:
+      # Danh sách container trong mỗi Pod
+      containers:
+        - name: demo-api
+          image: docker.io/library/demo-api:0.0.1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
