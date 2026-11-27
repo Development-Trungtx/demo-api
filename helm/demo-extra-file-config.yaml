@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: demo-extra-file-config
+  namespace: learning
+data:
+  application.yaml: |
+    server:
+      port: 8081
+      servlet:
+        context-path: /extra
+
+    spring:
+      application:
+        name: demo-extra-file

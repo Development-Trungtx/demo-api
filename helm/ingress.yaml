@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: demo-api-ingress
+  namespace: learning
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: api.demo.test
+      http:
+        paths:
+#          - path: /
+          - path: /test
+            pathType: Prefix
+            backend:
+              # Get from service
+              service:
+                name: demo-api
+                port:
+                  number: 80
+          - path: /extra
+            pathType: Prefix
+            backend:
+              service:
+                name: demo-extra
+                port:
+                  number: 80

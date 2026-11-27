@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-extra
+  namespace: learning
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-extra
+  template:
+    metadata:
+      labels:
+        app: demo-extra
+    spec:
+      volumes:
+        - name: app-config
+          configMap:
+            name: demo-extra-file-config
+      containers:
+        - name: demo-extra
+          image: docker.io/library/demo-api:0.0.3
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8081
+          env:
+            - name: SPRING_CONFIG_ADDITIONAL_LOCATION
+              value: "file:/etc/demo-config/"
+            - name: DEMO_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: demo-extra-secret
+                  key: DEMO_API_KEY
+          # Checking application status
+          readinessProbe:
+            httpGet:
+              path: /extra/test
+              port: 8081
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /extra/test
+              port: 8081
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /extra/test
+              port: 8081
+            periodSeconds: 2
+            timeoutSeconds: 2
+            failureThreshold: 30
+          volumeMounts:
+            - name: app-config
+              mountPath: /etc/demo-config
+              readOnly: true
+#          envFrom:
+#            - configMapRef:
+#                name: demo-extra-config
+#                name: demo-extra-config-wrong
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-extra
+  namespace: learning
+spec:
+  type: ClusterIP
+  selector:
+    app: demo-extra
+  ports:
+    - port: 80
+      targetPort: 8081
