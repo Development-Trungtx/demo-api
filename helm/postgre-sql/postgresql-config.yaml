@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgresql-config
+  namespace: learning
+data:
+  POSTGRES_USER: "lab"
+  POSTGRES_PASSWORD: "LabPassword123"
+  POSTGRES_DB: "learning"

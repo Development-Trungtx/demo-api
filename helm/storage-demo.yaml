@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: demo-data
+  namespace: learning
+spec:
+  storageClassName: local-path
+  accessModes:
+    # With the ReadWriteOnce volume was mount read/write from one node at time but mine just in one pod
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: storage-demo
+  namespace: learning
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: storage-demo
+  template:
+    metadata:
+      labels:
+        app: storage-demo
+    spec:
+      containers:
+        - name: storage-demo
+          image: busybox:1.37
+          command: ["sh", "-c", "sleep 86400"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            # pod using PVC include in same namespace
+            claimName: demo-data

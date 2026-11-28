@@ -7,6 +7,7 @@ kind: Deployment
 metadata:
   # Tên Deployment
   name: demo-api
+  namespace: learning
 
   # Nhãn chính của Deployment
   labels:
@@ -55,3 +56,10 @@ spec:
             imagePullPolicy: Never
             ports:
               - containerPort: 8080
+            resources:
+              requests:
+                cpu: "100m"
+                memory: "256Mi"
+              limits:
+                cpu: "1"
+                memory: "512Mi"

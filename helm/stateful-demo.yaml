@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: state-demo-headless
+  namespace: learning
+spec:
+  # Create a headless service to facilitate DNS resolution directly to the Pod
+  clusterIP: None
+  selector:
+    app: state-demo
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+
+# Manager these pod available
+kind: StatefulSet
+metadata:
+  name: state-demo
+  namespace: learning
+spec:
+  serviceName: state-demo-headless
+  replicas: 2
+  selector:
+    matchLabels:
+      app: state-demo
+  template:
+    metadata:
+      labels:
+        app: state-demo
+    spec:
+      containers:
+        - name: busybox
+          image: busybox:1.37
+          command: [ "httpd", "-f", "-p", "8080", "-h", "/data" ]
+          ports:
+            - name: http
+              containerPort: 8080
+          volumeMounts:
+            - name: data
+              mountPath: /data
+  # Template for create PVC for each pod
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        storageClassName: local-path
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
